@@ -23,12 +23,16 @@ function auth(req, res, next) {
 
   // 1. Check if header exists
   if (!authHeader) {
-    return res.status(401).json({success: false,msg: "Authorization header missing",});
+    return res
+      .status(401)
+      .json({ success: false, msg: "Authorization header missing" });
   }
 
   // 2. Check Bearer format
   if (!authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({success: false,msg: "Invalid authorization format",});
+    return res
+      .status(401)
+      .json({ success: false, msg: "Invalid authorization format" });
   }
 
   // 3. Extract token
@@ -42,11 +46,16 @@ function auth(req, res, next) {
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      msg: "Invalid or expired token",
-    });
+    return res.status(401).json({msg: "Invalid or expired token", success: false});
   }
 }
 
-module.exports = { auth };
+function doctor(req, res, next) {
+  if ((req.user.role == "doctor")) {
+    next();
+  } else {
+    return res.status(403).send({ msg: "You are not authorized !" });
+  }
+}
+
+module.exports = { auth, doctor };
